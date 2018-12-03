@@ -1,10 +1,11 @@
-package cn.edu360.spark
+package cn.edu360.wrodcount
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
-  * Created by zx on 2017/10/5.
+  * 每个学科最受欢迎的老师
+  * groupBy 分组topN
   *
   */
 object SubTchTopN1 {

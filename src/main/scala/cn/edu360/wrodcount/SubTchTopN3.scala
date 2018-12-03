@@ -1,4 +1,4 @@
-package cn.edu360.spark
+package cn.edu360.wrodcount
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{Partitioner, SparkConf, SparkContext}
@@ -6,11 +6,12 @@ import org.apache.spark.{Partitioner, SparkConf, SparkContext}
 import scala.collection.mutable
 
 /**
-  * Created by zx on 2017/10/5.
+  * 每个学科最受欢迎的老师
+  * 自定义分区器
   *
   */
 
-// 分区器
+
 object SubTchTopN3 {
 
   val N: Int = 3
@@ -43,7 +44,7 @@ object SubTchTopN3 {
     // 聚合， 将学科sub 和老师tea 联合当做key
     val reduced: RDD[((String, String), Int)] = subAndTeachersAndOne.reduceByKey(partitioner, _ + _)
 
-    //    // 自定义一个分区器，并按指定的分区器进行分区
+    //    // 自定义一个分区器，并按指定的分区器进行分区 （已合并至上一步reduce）
     //    val partitioned: RDD[((String, String), Int)] = reduced.partitionBy(partitioner)
 
     // 如果一次拿出一个分区，就可以操作一个分区中的数据了

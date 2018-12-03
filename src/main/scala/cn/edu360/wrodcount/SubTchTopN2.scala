@@ -1,12 +1,15 @@
-package cn.edu360.spark
+package cn.edu360.wrodcount
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
-  * Created by zx on 2017/10/5.
-  *
+  * 每个学科最受欢迎的老师
+  * 埋点 checkpoint
+  * 过滤多次提交
+  * cache缓存到内存中
   */
+
 object SubTchTopN2 {
 
   val N: Int = 3
@@ -19,8 +22,8 @@ object SubTchTopN2 {
     //创建spark执行的入口
     val sc = new SparkContext(conf)
 
-    // 设置checkpoint的位置
-    sc.setCheckpointDir("hdfs://host-01:9000/checkpoint")
+    // 设置checkpoint（埋点）的位置
+    //    sc.setCheckpointDir("hdfs://host-01:9000/checkpoint")
 
     // 在driver端获取到全部的规则数据
 
@@ -42,11 +45,11 @@ object SubTchTopN2 {
     // 计算共有哪些学科
     val subs: Array[String] = reduced.map(_._1._1).distinct().collect()
 
-    // 缓存到内存，提高运算速度
+    // 缓存cache到内存，提高运算速度
     val cached = reduced.cache()
 
     // 埋点
-    val checkpoint = reduced.checkpoint
+    //    val checkpoint = reduced.checkpoint
 
     for (elem <- subs) {
       // 过滤后只剩一个学科的数据
