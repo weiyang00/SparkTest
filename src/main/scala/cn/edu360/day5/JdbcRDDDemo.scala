@@ -6,7 +6,7 @@ import org.apache.spark.rdd.{JdbcRDD, RDD}
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
-  * Created by zx on 2017/10/10.
+  * RDD从Mysql中读取数据
   */
 object JdbcRddDemo {
 
@@ -30,7 +30,7 @@ object JdbcRddDemo {
       "SELECT * FROM logs WHERE id >= ? AND id < ?",
       1,
       5,
-      2, //分区数量
+      2, //分区数量 -- 分区数量影响读取的数据数量（当 sql中  使用 大于小于号时会出现问题 ， 所以须要统一使用 <= 和 >= 符号 ）
       rs => {
         val id = rs.getInt(1)
         val name = rs.getString(2)

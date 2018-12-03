@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
-  * Created by zx on 2017/10/10.
+  *
   */
 object CustomSort1 {
 
@@ -25,9 +25,8 @@ object CustomSort1 {
       val fields = line.split(" ")
       val name = fields(0)
       val age = fields(1).toInt
-      val fv = fields(2).toInt
-      //(name, age, fv)
-      new User(name, age, fv)
+      val faceValue = fields(2).toInt
+      new User(name, age, faceValue)
     })
 
     //不满足要求
@@ -47,15 +46,15 @@ object CustomSort1 {
 }
 
 
-class User(val name: String, val age: Int, val fv: Int) extends Ordered[User] with Serializable {
+class User(val name: String, val age: Int, val faceValue: Int) extends Ordered[User] with Serializable {
 
   override def compare(that: User): Int = {
-    if (this.fv == that.fv) {
+    if (this.faceValue == that.faceValue) {
       this.age - that.age
     } else {
-      -(this.fv - that.fv)
+      -(this.faceValue - that.faceValue)
     }
   }
 
-  override def toString: String = s"name: $name, age: $age, fv: $fv"
+  override def toString: String = s"name: $name, age: $age, faceValue: $faceValue"
 }
