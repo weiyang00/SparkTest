@@ -18,7 +18,7 @@ object ScalaWordCount {
     //指定以后从哪里读取数据创建RDD（弹性分布式数据集）
     //sc.textFile(args(0)).flatMap(_.split(" ")).map((_, 1)).reduceByKey(_+_).sortBy(_._2, false).saveAsTextFile(args(1))
 
-    val lines: RDD[String] = sc.textFile(args(0))
+    val lines: RDD[String] = sc.textFile("D://result.txt")
     //切分压平
     val count: Long = lines.count()
     val words: RDD[String] = lines.flatMap(_.split(" "))
@@ -29,7 +29,7 @@ object ScalaWordCount {
     //排序
     val sorted: RDD[(String, Int)] = reduced.sortBy(_._2, false)
     //将结果保存到HDFS中
-    sorted.saveAsTextFile(args(1))
+    sorted.saveAsTextFile("hdfs://qingdao1.emulian.com:9000/testDir-weiyang/ipcounts2")
     //释放资源
     sc.stop()
 

@@ -1,6 +1,6 @@
 package cn.edu360.day7
 
-import cn.edu360.day4.MyUtils
+import cn.edu360.IpLocation.MyUtils
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}

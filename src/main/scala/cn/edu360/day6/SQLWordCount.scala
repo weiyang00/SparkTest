@@ -1,6 +1,6 @@
 package cn.edu360.day6
 
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql._
 
 /**
   * Created by zx on 2017/10/13.

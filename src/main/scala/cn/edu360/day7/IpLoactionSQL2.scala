@@ -1,12 +1,13 @@
 package cn.edu360.day7
 
-import cn.edu360.day4.MyUtils
+
+import cn.edu360.IpLocation.MyUtils
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 /**
   * Created by zx on 2017/10/9.
-  * jon的代价太昂贵，而且非常慢，解决思路是将表缓存起来（广播变量）
+  * jon的代价太昂贵，而且非常慢，解决思路是将小表缓存起来（广播变量）
   */
 object IpLoactionSQL2 {
 
@@ -67,7 +68,6 @@ object IpLoactionSQL2 {
       }
       province
     })
-
 
     //执行SQL
     val r = spark.sql("SELECT ip2Province(ip_num) province, COUNT(*) counts FROM v_log GROUP BY province ORDER BY counts DESC")
