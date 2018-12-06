@@ -19,7 +19,6 @@ object UdafTest {
       .master("local[*]")
       .getOrCreate()
 
-
     val geomean = new GeoMean
 
     val range: Dataset[Long] = spark.range(1, 11)

@@ -5,7 +5,7 @@ import java.util.Properties
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 /**
-  * Created by zx on 2017/5/13.
+  * 将数据写入到多种数据源，写入到多种数据类型中
   */
 object JdbcDataSource {
 

@@ -19,11 +19,11 @@ object JoinIPTest {
     import spark.implicits._
 
     // 读取ip 规则
-    val ipLines: Dataset[String] = spark.read.textFile("hdfs://120.27.41.246:9000/testDir-weiyang/ips/ip.txt")
+    val ipLines: Dataset[String] = spark.read.textFile("hdfs://qingdao1.emulian.com:9000/testDir-weiyang/ips/ip.txt")
     //        val ipLines: Dataset[String] = spark.read.textFile("D://ip.txt")
 
     // 读取access.log日志
-    val logLines: Dataset[String] = spark.read.textFile("hdfs://120.27.41.246:9000/testDir-weiyang/logs/access.log")
+    val logLines: Dataset[String] = spark.read.textFile("hdfs://qingdao1.emulian.com:9000/testDir-weiyang/logs/access.log")
     //        val logLines: Dataset[String] = spark.read.textFile("D://access.log")
 
     // 对数据进行整理,整理ip

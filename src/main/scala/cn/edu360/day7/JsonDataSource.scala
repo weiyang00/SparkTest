@@ -3,7 +3,8 @@ package cn.edu360.day7
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
-  * Created by zx on 2017/9/18.
+  * 读取多种数据源，从多种数据源读取
+  * 读取json格式
   */
 object JsonDataSource {
 
