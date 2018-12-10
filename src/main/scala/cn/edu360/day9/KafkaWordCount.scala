@@ -17,7 +17,7 @@ object KafkaWordCount {
 
     val ssc = new StreamingContext(conf, Seconds(5))
 
-    val zkQuorum = "node-1:2181,node-2:2181,node-3:2181"
+    val zkQuorum = "host-0:2182,host-0:2183,host-0:2184"
     val groupId = "g1"
     // topic 对应几个线程 （这里是一个线程）
     val topic = Map[String, Int]("xiaoniuabc" -> 1)
