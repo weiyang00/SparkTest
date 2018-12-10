@@ -6,10 +6,10 @@ import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 /**
-  * Created by zx on 2017/10/17.
+  * Streaming 从kafka中读取数据
+  *
   */
 object KafkaWordCount {
-
 
   def main(args: Array[String]): Unit = {
 
@@ -19,6 +19,7 @@ object KafkaWordCount {
 
     val zkQuorum = "node-1:2181,node-2:2181,node-3:2181"
     val groupId = "g1"
+    // topic 对应几个线程 （这里是一个线程）
     val topic = Map[String, Int]("xiaoniuabc" -> 1)
 
     //创建DStream，需要KafkaDStream

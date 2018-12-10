@@ -19,7 +19,7 @@ object SteamingWordCount {
     //第二个参数是小批次产生的时间间隔
     val ssc = new StreamingContext(sc, Milliseconds(5000))
 
-    //有了StreamingContext，就可以创建SparkStreaming的抽象了DSteam
+    //有了StreamingContext，就可以创建SparkStreaming的抽象了DStream
     //从一个socket端口中读取数据
     //在Linux上用yum安装nc
     //yum install -y nc
