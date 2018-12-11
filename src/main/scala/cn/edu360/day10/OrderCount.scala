@@ -1,35 +1,43 @@
-package cn.edu360.day9
+package cn.edu360.day10
 
+import cn.edu360.day4.MyUtils
 import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
 import kafka.utils.{ZKGroupTopicDirs, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
+import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
-import org.apache.spark.streaming.dstream.{DStream, InputDStream}
+import org.apache.spark.broadcast.Broadcast
+import org.apache.spark.rdd.RDD
+import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka.{HasOffsetRanges, KafkaUtils, OffsetRange}
 import org.apache.spark.streaming.{Duration, StreamingContext}
 
 /**
   * Created by zx on 2017/7/31.
   */
-object KafkaDirectWordCount {
+object OrderCount {
 
   def main(args: Array[String]): Unit = {
 
-    //指定组名 （消费者组）
-    val group = "g001"
+    //指定组名
+    val group = "g1"
     //创建SparkConf
-    val conf = new SparkConf().setAppName("KafkaDirectWordCount").setMaster("local[2]")
+    val conf = new SparkConf().setAppName("OrderCount").setMaster("local[4]")
     //创建SparkStreaming，并设置间隔时间
     val ssc = new StreamingContext(conf, Duration(5000))
+
+    val broadcastRef = IPUtils.broadcastIpRules(ssc, "/Users/zx/Desktop/temp/spark-24/spark-4/ip/ip.txt")
+
+
     //指定消费的 topic 名字
-    val topic = "wwcc"
+    val topic = "orders"
     //指定kafka的broker地址(sparkStream的Task直连到kafka的分区上，用更加底层的API消费，效率更高)
-    val brokerList = "host-02:9092,host-03:9092,host-04:9092"
+    val brokerList = "node-4:9092,node-5:9092,node-6:9092"
 
     //指定zk的地址，后期更新消费的偏移量时使用(以后可以使用Redis、MySQL来记录偏移量)
-    val zkQuorum = "host-0:2182,host-0:2183,host-0:2184"
+    val zkQuorum = "node-1:2181,node-2:2181,node-3:2181"
     //创建 stream 时使用的 topic 名字集合，SparkStreaming可同时消费多个topic
     val topics: Set[String] = Set(topic)
 
@@ -40,6 +48,9 @@ object KafkaDirectWordCount {
 
     //准备kafka的参数
     val kafkaParams = Map(
+      //"key.deserializer" -> classOf[StringDeserializer],
+      //"value.deserializer" -> classOf[StringDeserializer],
+      //"deserializer.encoding" -> "GB2312", //配置读取Kafka中数据的编码
       "metadata.broker.list" -> brokerList,
       "group.id" -> group,
       //从头开始读取数据
@@ -63,6 +74,7 @@ object KafkaDirectWordCount {
     var fromOffsets: Map[TopicAndPartition, Long] = Map()
 
     //如果保存过 offset
+    //注意：偏移量的查询是在Driver完成的
     if (children > 0) {
       for (i <- 0 until children) {
         // /g001/offsets/wordcount/0/10001
@@ -91,31 +103,38 @@ object KafkaDirectWordCount {
     //偏移量的范围
     var offsetRanges = Array[OffsetRange]()
 
-    //从kafka读取的消息，DStream的Transform方法可以将当前批次的RDD获取出来
-    //该transform方法计算获取到当前批次RDD,然后将RDD的偏移量取出来，然后在将RDD返回到DStream
-    val transform: DStream[(String, String)] = kafkaStream.transform { rdd =>
-      //得到该 rdd 对应 kafka 的消息的 offset
-      //该RDD是一个KafkaRDD，可以获得偏移量的范围
-      offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-      rdd
-    }
-    val messages: DStream[String] = transform.map(_._2)
+    //直连方式只有在KafkaDStream的RDD（KafkaRDD）中才能获取偏移量，那么就不能到调用DStream的Transformation
+    //所以只能子在kafkaStream调用foreachRDD，获取RDD的偏移量，然后就是对RDD进行操作了
+    //依次迭代KafkaDStream中的KafkaRDD
+    //如果使用直连方式累加数据，那么就要在外部的数据库中进行累加（用KeyVlaue的内存数据库（NoSQL），Redis）
+    //kafkaStream.foreachRDD里面的业务逻辑是在Driver端执行
+    kafkaStream.foreachRDD { kafkaRDD =>
+      //判断当前的kafkaStream中的RDD是否有数据
+      if(!kafkaRDD.isEmpty()) {
+        //只有KafkaRDD可以强转成HasOffsetRanges，并获取到偏移量
+        offsetRanges = kafkaRDD.asInstanceOf[HasOffsetRanges].offsetRanges
+        val lines: RDD[String] = kafkaRDD.map(_._2)
 
-    //依次迭代DStream中的RDD
-    messages.foreachRDD { rdd =>
-      //对RDD进行操作，触发Action
-      rdd.foreachPartition(partition =>
-        partition.foreach(x => {
-          println(x)
-        })
-      )
+        //整理数据
+        val fields: RDD[Array[String]] = lines.map(_.split(" "))
 
-      for (o <- offsetRanges) {
-        //  /g001/offsets/wordcount/0
-        val zkPath = s"${topicDirs.consumerOffsetDir}/${o.partition}"
-        //将该 partition 的 offset 保存到 zookeeper
-        //  /g001/offsets/wordcount/0/20000
-        ZkUtils.updatePersistentPath(zkClient, zkPath, o.untilOffset.toString)
+        //计算成交总金额
+        CalculateUtil.calculateIncome(fields)
+
+        //计算商品分类金额
+        CalculateUtil.calculateItem(fields)
+
+        //计算区域成交金额
+        CalculateUtil.calculateZone(fields, broadcastRef)
+
+        //偏移量跟新在哪一端（）
+        for (o <- offsetRanges) {
+          //  /g001/offsets/wordcount/0
+          val zkPath = s"${topicDirs.consumerOffsetDir}/${o.partition}"
+          //将该 partition 的 offset 保存到 zookeeper
+          //  /g001/offsets/wordcount/0/20000
+          ZkUtils.updatePersistentPath(zkClient, zkPath, o.untilOffset.toString)
+        }
       }
     }
 

@@ -74,6 +74,13 @@
             <version>${spark.version}</version>
         </dependency>
 
+        <!-- redis 客户端 jedis 的依赖 -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
