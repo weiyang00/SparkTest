@@ -1,12 +1,10 @@
 package cn.edu360.day10
 
-import cn.edu360.day4.MyUtils
 import kafka.common.TopicAndPartition
 import kafka.message.MessageAndMetadata
 import kafka.serializer.StringDecoder
 import kafka.utils.{ZKGroupTopicDirs, ZkUtils}
 import org.I0Itec.zkclient.ZkClient
-import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.SparkConf
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
