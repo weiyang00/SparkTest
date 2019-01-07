@@ -12,7 +12,7 @@ object IPUtils {
   def broadcastIpRules(ssc: StreamingContext, ipRulesPath: String): Broadcast[Array[(Long, Long, String)]] = {
     //现获取sparkContext
     val sc = ssc.sparkContext
-    val rulesLines:RDD[String] = sc.textFile(ipRulesPath)
+    val rulesLines: RDD[String] = sc.textFile(ipRulesPath)
     //整理ip规则数据
     val ipRulesRDD: RDD[(Long, Long, String)] = rulesLines.map(line => {
       val fields = line.split("[|]")

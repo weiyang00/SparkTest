@@ -5,10 +5,11 @@ import redis.clients.jedis.Jedis
 /**
   * Created by zx on 2017/10/20.
   */
+
 import redis.clients.jedis.{Jedis, JedisPool, JedisPoolConfig}
 
 
-object JedisConnectionPool{
+object JedisConnectionPool {
 
   val config = new JedisPoolConfig()
   //最大连接数,
@@ -28,19 +29,19 @@ object JedisConnectionPool{
 
 
     val conn = JedisConnectionPool.getConnection()
-//    conn.set("income", "1000")
-//
-//    val r1 = conn.get("xiaoniu")
-//
-//    println(r1)
-//
-//    conn.incrBy("xiaoniu", -50)
-//
-//    val r2 = conn.get("xiaoniu")
-//
-//    println(r2)
-//
-//    conn.close()
+    //    conn.set("income", "1000")
+    //
+    //    val r1 = conn.get("xiaoniu")
+    //
+    //    println(r1)
+    //
+    //    conn.incrBy("xiaoniu", -50)
+    //
+    //    val r2 = conn.get("xiaoniu")
+    //
+    //    println(r2)
+    //
+    //    conn.close()
 
     val r = conn.keys("*")
     import scala.collection.JavaConversions._

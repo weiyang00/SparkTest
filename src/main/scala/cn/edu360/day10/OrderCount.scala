@@ -108,7 +108,7 @@ object OrderCount {
     //kafkaStream.foreachRDD里面的业务逻辑是在Driver端执行
     kafkaStream.foreachRDD { kafkaRDD =>
       //判断当前的kafkaStream中的RDD是否有数据
-      if(!kafkaRDD.isEmpty()) {
+      if (!kafkaRDD.isEmpty()) {
         //只有KafkaRDD可以强转成HasOffsetRanges，并获取到偏移量
         offsetRanges = kafkaRDD.asInstanceOf[HasOffsetRanges].offsetRanges
         val lines: RDD[String] = kafkaRDD.map(_._2)

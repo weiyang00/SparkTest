@@ -13,11 +13,11 @@ object CalculateUtil {
   def calculateIncome(fields: RDD[Array[String]]) = {
     //将数据计算后写入到Reids
     val priceRDD: RDD[Double] = fields.map(arr => {
-     arr(4).toDouble
+      arr(4).toDouble
     })
     //reduce是一个Action，会把结果返回到Driver端
     //将当前批次的总金额返回了
-    val sum: Double = priceRDD.reduce(_+_)
+    val sum: Double = priceRDD.reduce(_ + _)
     //获取一个jedis连接
     val conn = JedisConnectionPool.getConnection()
     //将历史值和当前的值进行累加
@@ -29,6 +29,7 @@ object CalculateUtil {
 
   /**
     * 计算分类的成交金额
+    *
     * @param fields
     */
   def calculateItem(fields: RDD[Array[String]]) = {
@@ -41,7 +42,7 @@ object CalculateUtil {
       (item, parice)
     })
     //安装商品分类进行聚合
-    val reduced: RDD[(String, Double)] = itemAndPrice.reduceByKey(_+_)
+    val reduced: RDD[(String, Double)] = itemAndPrice.reduceByKey(_ + _)
     //将当前批次的数据累加到Redis中
     //foreachPartition是一个Action
     //现在这种方式，jeids的连接是在哪一端创建的（Driver）
@@ -70,7 +71,7 @@ object CalculateUtil {
       val price = arr(4).toDouble
       val ipNum = MyUtils.ip2Long(ip)
       //在Executor中获取到广播的全部规则
-       val allRules: Array[(Long, Long, String)] = broadcastRef.value
+      val allRules: Array[(Long, Long, String)] = broadcastRef.value
       //二分法查找
       val index = MyUtils.binarySearch(allRules, ipNum)
       var province = "未知"
@@ -81,7 +82,7 @@ object CalculateUtil {
       (province, price)
     })
     //按省份进行聚合
-    val reduced: RDD[(String, Double)] = provinceAndPrice.reduceByKey(_+_)
+    val reduced: RDD[(String, Double)] = provinceAndPrice.reduceByKey(_ + _)
     //将数据跟新到Redis
     reduced.foreachPartition(part => {
       val conn = JedisConnectionPool.getConnection()
